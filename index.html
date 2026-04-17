@@ -1905,7 +1905,7 @@ REGRAS:
             'anthropic-dangerous-direct-browser-access': 'true'
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: 'claude-3-5-sonnet-20241022',
             max_tokens: 1024,
             system: AI_CONTEXT,
             messages: chatHistory
@@ -1913,6 +1913,8 @@ REGRAS:
         });
 
         const data = await response.json();
+        console.log('API response:', data);
+        if (data.error) throw new Error(data.error.message);
         const reply = data.content?.[0]?.text || 'Desculpe, não consegui processar. Tente novamente.';
 
         chatHistory.push({ role: 'assistant', content: reply });
@@ -1925,7 +1927,8 @@ REGRAS:
         msgs.innerHTML += '<div class="ai-msg assistant">' + formatted + '</div>';
       } catch (err) {
         document.getElementById(typingId)?.remove();
-        msgs.innerHTML += '<div class="ai-msg assistant" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.06);">Erro na conexão com a I.A. Verifique a internet e tente novamente.</div>';
+        console.error('AI error:', err);
+        msgs.innerHTML += '<div class="ai-msg assistant" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.06);">Erro: ' + escapeHtml(err.message) + '</div>';
       }
 
       sendBtn.disabled = false;
